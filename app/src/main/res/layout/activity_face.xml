@@ -1,68 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context="com.opencv.android.faceapplocker.FaceActivity">
-
+    android:layout_height="match_parent" >
 
     <Button
-        android:id="@+id/add_a_name"
+        android:id="@+id/Add_Name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="Add name"/>
+        android:text="Add Name" />
 
     <Button
         android:id="@+id/detect_face"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/add_a_name"
-        android:layout_marginTop="2dp"
-        android:text="Detect Face"/>
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/Add_Name"
+        android:layout_marginTop="39dp"
+        android:text="Detect Face" />
 
     <Button
-        android:id="@+id/Snap"
+        android:id="@+id/take_picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:text="Take Snapshot"/>
-
-
-
-
-    <TextView
-        android:id="@+id/detected_face_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:text=""
-        tools:text="Abdulrahman" />
+        android:text="Take Picture" />
 
     <EditText
         android:id="@+id/name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@id/detected_face_name"
+        android:layout_above="@+id/detect_face"
         android:layout_centerHorizontal="true"
-        android:ems="10">
+        android:ems="10" >
 
-        <requestFocus/>
+        <requestFocus />
     </EditText>
 
     <ImageView
-        android:id="@+id/snapshot"
+        android:id="@+id/captured_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_toRightOf="@id/name"
-        android:src="@android:drawable/ic_menu_search"/>
+        android:src="@android:drawable/ic_menu_search" />
+
+    <TextView
+        android:id="@+id/Detected_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:text="" />
 
 </RelativeLayout>
-
