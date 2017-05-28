@@ -10,7 +10,7 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:padding="5dp"
-        android:contentDescription="icon_image"
+        android:contentDescription="@string/file_icon"
         />
 
     <TextView

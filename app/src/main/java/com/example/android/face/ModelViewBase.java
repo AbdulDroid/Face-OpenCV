@@ -1,5 +1,6 @@
 package com.example.android.face;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -7,7 +8,6 @@ import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.CameraInfo;
 import android.hardware.Camera.PreviewCallback;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -17,24 +17,29 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by Abdulkarim on 5/7/2017.
+ * Created by Isa Abuljalil with Matriculation number: 13/SCI01/010
+ * on 04/19/2017.
  */
 
 public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder.Callback, Runnable {
     private static final String TAG = "Sample::SurfaceView";
 
-    public Camera               mCamera;
-    public CameraInfo           mCameraInfo;
-    private SurfaceHolder       mHolder;
-    private int                 mFrameWidth;
-    private int                 mFrameHeight;
-    private byte[]              mFrame;
-    private boolean             mThreadRun;
-    private byte[]              mBuffer;
-
+    public Camera mCamera;
+    public CameraInfo mCameraInfo;
+    private SurfaceHolder mHolder;
+    public Camera.Parameters mParams;
+    private int mFrameWidth;
+    private int mFrameHeight;
+    private byte[] mFrame;
+    private boolean mThreadRun;
+    private boolean faceDetectionRunning;
+    private byte[] mBuffer;
+    Context mContext;
+    private int cam;
 
     public ModelViewBase(Context context) {
         super(context);
+        this.mContext = context;
         mHolder = getHolder();
         mHolder.addCallback(this);
         Log.i(TAG, "Instantiated new " + this.getClass());
@@ -50,6 +55,7 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
 
     public void setPreview() throws IOException {
         mCamera.setPreviewDisplay(null);
+        mCameraInfo = new CameraInfo();
     }
 
     int getFrontCameraId() {
@@ -60,14 +66,15 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
         }
         return -1; // No front-facing camera found
     }
+
     public boolean openCamera() {
         Log.i(TAG, "openCamera");
         releaseCamera();
-        int cam=getFrontCameraId();
-        Log.i("Ajay",cam+"ID");
+        cam = getFrontCameraId();
+        Log.i(TAG, "Front Camera ID " + cam);
         // if(cam!=-1)
-        mCamera = Camera.open();
-        if(mCamera == null) {
+        mCamera = Camera.open(cam);
+        if (mCamera == null) {
             Log.e(TAG, "Can't open camera!");
             return false;
         }
@@ -109,7 +116,7 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
 
                 // selecting optimal camera preview size
                 {
-                    int  minDiff = Integer.MAX_VALUE;
+                    int minDiff = Integer.MAX_VALUE;
                     for (Camera.Size size : sizes) {
                         if (Math.abs(size.height - height) < minDiff) {
                             mFrameWidth = size.width;
@@ -122,8 +129,7 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
                 params.setPreviewSize(getFrameWidth(), getFrameHeight());
 
                 List<String> FocusModes = params.getSupportedFocusModes();
-                if (FocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO))
-                {
+                if (FocusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
                     params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
                 }
 
@@ -132,10 +138,10 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
                 /* Now allocate the buffer */
                 params = mCamera.getParameters();
                 int size = params.getPreviewSize().width * params.getPreviewSize().height;
-                size  = size * ImageFormat.getBitsPerPixel(params.getPreviewFormat()) / 8 * 2;
+                size = size * ImageFormat.getBitsPerPixel(params.getPreviewFormat()) / 8 * 2;
                 mBuffer = new byte[size];
                 /* The buffer where the current frame will be copied */
-                mFrame = new byte [size];
+                mFrame = new byte[size];
                 mCamera.addCallbackBuffer(mBuffer);
 
                 try {
@@ -155,12 +161,32 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
 
     public void surfaceChanged(SurfaceHolder _holder, int format, int width, int height) {
         Log.i(TAG, "surfaceChanged");
+        if (_holder.getSurface() == null) {
+            return;
+        }
+        try {
+            mCamera.stopPreview();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        setCameraDisplayOrientation((Activity) mContext, cam, mCamera);
         setupCamera(width, height);
+        try {
+            mCamera.setPreviewDisplay(_holder);
+            mCamera.startPreview();
+        } catch (Exception e) {
+            Log.i(TAG, "Error starting camera preview: " + e.getMessage());
+        }
     }
 
     public void surfaceCreated(SurfaceHolder holder) {
         Log.i(TAG, "surfaceCreated");
-        mCamera.setDisplayOrientation(getCameraOrientation(mCameraInfo, mCamera));
+        try {
+            mCamera.setPreviewDisplay(holder);
+            mCamera.startPreview();
+        } catch (IOException e) {
+            Log.d(TAG, "Error setting camera preview: " + e.getMessage());
+        }
         (new Thread(this)).start();
     }
 
@@ -169,13 +195,40 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
         releaseCamera();
     }
 
+//    public int doFaceDetection() {
+//        if (faceDetectionRunning) {
+//            return 0;
+//        }
+//
+//        if (mParams.getMaxNumDetectedFaces() <= 0) {
+//            Log.e(TAG, "Face Detection not supported");
+//            return -1;
+//        }
+//
+//        MyFaceDetector mDetectionListener = new MyFaceDetector();
+//        mCamera.setFaceDetectionListener(mDetectionListener);
+//        mCamera.startFaceDetection();
+//        faceDetectionRunning = true;
+//        return 1;
+//    }
+//
+//    public int stopFaceDetection() {
+//        if (faceDetectionRunning) {
+//            mCamera.stopFaceDetection();
+//            faceDetectionRunning = false;
+//            return 1;
+//        }
+//        return 0;
+//    }
+
     /* The bitmap returned by this method shall be owned by the child and released in onPreviewStopped() */
     protected abstract Bitmap processFrame(byte[] data);
 
     /**
      * This method is called when the preview process is being started. It is called before the first frame delivered and processFrame is called
      * It is called with the width and height parameters of the preview process. It can be used to prepare the data needed during the frame processing.
-     * @param previewWidth - the width of the preview frames that will be delivered via processFrame
+     *
+     * @param previewWidth  - the width of the preview frames that will be delivered via processFrame
      * @param previewHeight - the height of the preview frames that will be delivered via processFrame
      */
     protected abstract void onPreviewStarted(int previewWidth, int previewHeight);
@@ -204,19 +257,28 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
 
             if (bmp != null) {
                 Canvas canvas = mHolder.lockCanvas();
-                if (canvas != null) {
-                    canvas.drawBitmap(bmp, (canvas.getWidth() - getFrameWidth()) / 2, (canvas.getHeight() - getFrameHeight()) / 2, null);
-                    mHolder.unlockCanvasAndPost(canvas);
+                if (canvas == null) {
+                    try {
+                        canvas.drawBitmap(bmp, (canvas.getWidth() - getFrameWidth()) / 2,
+                                (canvas.getHeight() - getFrameHeight()) / 2, null);
+                        mHolder.unlockCanvasAndPost(canvas);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
     }
 
-    public int getCameraOrientation(CameraInfo info, Camera camera){
-        int rotation = getWindowManager().getDefaultDisplay().getRotation();
+    public static void setCameraDisplayOrientation(Activity activity,
+                                                   int cameraId, android.hardware.Camera camera) {
+        android.hardware.Camera.CameraInfo info =
+                new android.hardware.Camera.CameraInfo();
+        android.hardware.Camera.getCameraInfo(cameraId, info);
+        int rotation = activity.getWindowManager().getDefaultDisplay()
+                .getRotation();
         int degrees = 0;
-
-        switch(rotation){
+        switch (rotation) {
             case Surface.ROTATION_0:
                 degrees = 0;
                 break;
@@ -232,12 +294,38 @@ public abstract class ModelViewBase extends SurfaceView implements SurfaceHolder
         }
 
         int result;
-        if (info.facing == CameraInfo.CAMERA_FACING_FRONT){
+        if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
             result = (info.orientation + degrees) % 360;
-            result = (360 - result) % 360;
-        }else{
+            result = (360 - result) % 360;  // compensate the mirror
+        } else {  // back-facing
             result = (info.orientation - degrees + 360) % 360;
         }
-        return result;
+        camera.setDisplayOrientation(result);
     }
+
+//    private class MyFaceDetector implements Camera.FaceDetectionListener {
+//
+//        @Override
+//        public void onFaceDetection(Camera.Face[] faces, Camera camera) {
+//            if (faces.length == 0) {
+//                Log.i(TAG, "No faces detected");
+//            } else if (faces.length > 0) {
+//                Log.i(TAG, "Faces Detected = " +
+//                        String.valueOf(faces.length));
+//
+//                List<Rect> faceRects;
+//                faceRects = new ArrayList<Rect>();
+//
+//                for (int i = 0; i < faces.length; i++) {
+//                    int left = faces[i].rect.left;
+//                    int right = faces[i].rect.right;
+//                    int top = faces[i].rect.top;
+//                    int bottom = faces[i].rect.bottom;
+//
+//                    Rect mRect = new Rect(left, top, right, bottom);
+//                    faceRects.add(mRect);
+//                }
+//            }
+//        }
+//    }
 }

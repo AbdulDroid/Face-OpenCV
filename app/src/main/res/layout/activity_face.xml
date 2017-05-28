@@ -1,63 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:paddingStart="8dp"
+    android:paddingTop="16dp"
+    android:paddingBottom="16dp"
+    android:paddingEnd="8dp">
 
-    <Button
-        android:id="@+id/Add_Name"
-        android:layout_width="wrap_content"
+    <TextView
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:text="Add Name" />
+        android:text="@string/user_name"
+        android:textColor="@color/colorAccent" />
 
     <Button
         android:id="@+id/detect_face"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_below="@+id/Add_Name"
+        android:layout_alignParentBottom="true"
         android:layout_marginTop="39dp"
-        android:text="Detect Face" />
+        android:text="@string/detect_face" />
+
+    <ImageView
+        android:id="@+id/captured_image"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_above="@id/detect_face"
+        android:layout_centerHorizontal="true"
+        android:contentDescription="@string/captured_image"
+        android:src="@android:drawable/ic_menu_search" />
 
     <Button
         android:id="@+id/take_picture"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentTop="true"
-        android:text="Take Picture" />
 
-    <EditText
-        android:id="@+id/name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/detect_face"
-        android:layout_centerHorizontal="true"
-        android:ems="10" >
-
-        <requestFocus />
-    </EditText>
-
-    <ImageView
-        android:id="@+id/captured_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:src="@android:drawable/ic_menu_search" />
-
-    <TextView
-        android:id="@+id/Detected_name"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:text="" />
-
+        android:text="@string/snapshot" />
 </RelativeLayout>

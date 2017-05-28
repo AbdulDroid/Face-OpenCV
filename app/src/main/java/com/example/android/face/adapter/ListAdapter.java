@@ -13,7 +13,8 @@ import com.example.android.face.R;
 import java.io.File;
 
 /**
- * Created by Abdulkarim on 5/9/2017.
+ * Created by Isa Abuljalil with Matriculation number: 13/SCI01/010
+ * on 04/19/2017.
  */
 
 public class ListAdapter extends ArrayAdapter<String> {

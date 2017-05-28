@@ -6,7 +6,8 @@ import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface.OnClickListener;
 
 /**
- * Created by Abdulkarim on 5/9/2017.
+ * Created by Isa Abuljalil with Matriculation number: 13/SCI01/010
+ * on 04/19/2017.
  */
 
 public class MessageAlert {

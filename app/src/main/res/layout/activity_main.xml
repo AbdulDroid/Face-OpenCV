@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,49 +7,48 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:paddingTop="16dp"
-    tools:context=".MainActivity"
-    android:orientation="vertical"
-    >
+    tools:context=".activities.FileActivity">
 
-    <EditText
-        android:id="@+id/txt_input"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:hint="@string/txt_hint"
-        />
     <LinearLayout
+        android:id="@+id/buttons"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        >
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        style="?android:attr/buttonBarStyle">
         <Button
+            style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/bt_lock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_lock"
-            android:onClick="lockFile"
-            />
+            android:text="@string/label_lock" />
         <Button
+            style="?android:attr/buttonBarButtonStyle"
             android:id="@+id/bt_unlock"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/label_unlock"
-            android:onClick="unlockFile"
-            />
+            android:text="@string/label_unlock" />
     </LinearLayout>
     <TextView
         android:id="@+id/txt_view"
-        android:layout_width="fill_parent"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/buttons"/>
     <ListView
         android:id="@+id/files_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_below="@id/txt_view"
         android:paddingBottom="5dp"
-        android:paddingTop="5dp"
+        android:paddingTop="5dp" />
 
-        />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/user_name"
+        android:textColor="@color/colorAccent"
+        android:layout_below="@id/files_list"/>
 
-</LinearLayout>
+</RelativeLayout>

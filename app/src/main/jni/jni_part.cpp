@@ -123,7 +123,10 @@ JNIEXPORT int JNICALL Java_com_example_android_face_ModelView_Find(JNIEnv* env, 
 			getline(liness, path, ';');
 			getline(liness, classlabel);
 			if(!path.empty() && !classlabel.empty()) {
-				images.push_back(imread(path, 0));
+				Mat m = imread(path, 1);
+				Mat m2;
+				cvtColor(m,m2,CV_BGR_GRAY);
+				images.push_back(m2);
 				labels.push_back(atoi(classlabel.c_str()));
 			}
 		}

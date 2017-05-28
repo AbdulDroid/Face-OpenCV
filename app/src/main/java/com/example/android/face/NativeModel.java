@@ -21,25 +21,24 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.android.face.activities.FaceActivity;
-import com.example.android.face.activities.ModelView;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.LoaderCallbackInterface;
 import org.opencv.android.OpenCVLoader;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 
 /**
- * Created by Abdulkarim on 5/7/2017.
+ * Created by Isa Abuljalil with Matriculation number: 13/SCI01/010
+ * on 04/19/2017.
  */
 
 public class NativeModel extends AppCompatActivity {
 
     private static final String TAG = "Sample::Activity";
     private ModelView mView;
-    Button ok_button,click_button,cancel_button,try_again_button;
+    Button ok_button,click_button,exit_button,try_again_button;
     ProgressDialog pg;
     Bitmap bmp;
     int count;
@@ -48,32 +47,31 @@ public class NativeModel extends AppCompatActivity {
     private class ButtonListener implements View.OnClickListener{
 
         public void onClick(View v) {
-            if(v.equals(findViewById(R.id.capture_button))){
+            int itemId = v.getId();
+            if(itemId == R.id.capture_button){
                 pg=ProgressDialog.show(NativeModel.this, null, "Capturing Image..");
                 pg.show();
                 mView.mCamera.takePicture(shutterCallback, rawCallback, jpegCallback);
-            }else if(v.equals(findViewById(R.id.cancel_button))){
+            }else if(itemId == R.id.exit_button){
                 finish();
-            }else if(v.equals(findViewById(R.id.ok_button))){
+            }else if(itemId == R.id.ok_button){
                 saveImage();
                 Toast.makeText(getApplicationContext(), "Saved File", Toast.LENGTH_SHORT).show();
                 FaceActivity.pictureTaken=true;
                 Intent i = new Intent(NativeModel.this,FaceActivity.class);
                 startActivity(i);
-            }else if(v.equals(findViewById(R.id.recapture_button))){
+                finish();
+            }else if(itemId == R.id.recapture_button) {
                 findViewById(R.id.img).setVisibility(View.GONE);
                 findViewById(R.id.preview).setVisibility(View.VISIBLE);
                 // mView.mCamera.grab();
                 ok_button.setVisibility(View.GONE);
-                cancel_button.setVisibility(View.VISIBLE);
                 try_again_button.setVisibility(View.GONE);
                 click_button.setVisibility(View.VISIBLE);
             }
         }
 
     }
-
-
 
     private BaseLoaderCallback mOpenCVCallBack = new BaseLoaderCallback(this) {
         @Override
@@ -87,7 +85,7 @@ public class NativeModel extends AppCompatActivity {
                     System.loadLibrary("native_sample");
 
                     // Create and set View
-                    mView = new ModelView(mAppContext);
+                    mView = new ModelView(NativeModel.this);
                     //setContentView(mView);
 
                     setContentView(R.layout.capture);
@@ -96,24 +94,24 @@ public class NativeModel extends AppCompatActivity {
                     findViewById(R.id.img).setVisibility(View.GONE);
 
                     ButtonListener listener=new ButtonListener();
-                    click_button=((Button) findViewById(R.id.capture_button));
+                    click_button=(Button) findViewById(R.id.capture_button);
                     click_button.setVisibility(View.VISIBLE);
                     click_button.setOnClickListener(listener);
 
-                    try_again_button=((Button) findViewById(R.id.recapture_button));
+                    try_again_button=(Button) findViewById(R.id.recapture_button);
                     try_again_button.setVisibility(View.GONE);
                     try_again_button.setOnClickListener(listener);
 
-                    cancel_button=((Button) findViewById(R.id.cancel_button));
-                    cancel_button.setVisibility(View.VISIBLE);
-                    cancel_button.setOnClickListener(listener);
-
-                    ok_button=((Button) findViewById(R.id.ok_button));
+                    ok_button=(Button) findViewById(R.id.ok_button);
                     ok_button.setVisibility(View.GONE);
                     ok_button.setOnClickListener(listener);
+                    exit_button = (Button) findViewById(R.id.exit_button);
+                    exit_button.setVisibility(View.VISIBLE);
+                    exit_button.setOnClickListener(listener);
+
 
                     count=0;
-//			        face_db = MainActivity.faces.get(MainActivity.current_name);
+//			        face_db = FileActivity.faces.get(FileActivity.current_name);
 
                     // Check native OpenCV camera
                     if( !mView.openCamera() ) {
@@ -211,6 +209,7 @@ public class NativeModel extends AppCompatActivity {
         public void onPictureTaken(byte[] data, Camera camera) {
             if(data!=null){
                 bmp= BitmapFactory.decodeByteArray(data,0,data.length);
+                bmp= Bitmap.createScaledBitmap(bmp,200,200,true);
                 findViewById(R.id.img).setVisibility(View.VISIBLE);
                 ((ImageView)findViewById(R.id.img)).setImageBitmap(bmp);
                 findViewById(R.id.preview).setVisibility(View.GONE);
@@ -228,14 +227,11 @@ public class NativeModel extends AppCompatActivity {
         FileOutputStream out;
 
         try {
-            File file=new File(FaceActivity.working_Dir,FaceActivity.current_name +".jpg");
-//            face_db.add(Environment.getExternalStorageDirectory().getAbsolutePath()+"/"+MainActivity.current_name+".jpg");
-            if(!file.exists()) file.createNewFile();
+            File file = new File(FaceActivity.working_Dir, FaceActivity.current_name + ".jpg");
+            if (!file.exists()) file.createNewFile();
             out = new FileOutputStream(file);
             bmp.compress(CompressFormat.JPEG, 90, out);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
+        }catch (Exception e) {
             e.printStackTrace();
         }
     }
