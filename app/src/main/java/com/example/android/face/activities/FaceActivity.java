@@ -32,29 +32,52 @@ import java.util.Map;
  */
 
 public class FaceActivity extends AppCompatActivity {
-    Button detect_face, take_picture;
-    private String File_Image_TAG = "image_db";
     public static Map<Integer, String> idToImage;
     public static Map<Integer, String> idToName;
     public static String default_name = "temp";
     public static String current_name = "test";
-    ImageView captured_image;
     public static boolean face_detected;
     public static File working_Dir = new File(Environment.getExternalStorageDirectory()
             .getAbsolutePath() + "/File Locker");
-    public CascadeClassifier haar_cascade;
     public static int ID;
-    private String Name_obt;
-    BufferedWriter bW;
+    public static boolean pictureTaken = false, recognized = false;
     static File fileC;
-    Intent i;
 
     static {
         working_Dir.mkdirs();
         fileC = new File(FaceActivity.working_Dir, "csv.txt");
     }
 
-    public static boolean pictureTaken = false, recognized = false;
+    public CascadeClassifier haar_cascade;
+    Button detect_face, take_picture;
+    ImageView captured_image;
+    BufferedWriter bW;
+    Intent i;
+    private String File_Image_TAG = "image_db";
+    private String Name_obt;
+
+    public static Bitmap decodeFile(File f, int WIDTH, int HEIGHT) {
+        try {
+            //Decode image size
+            BitmapFactory.Options o = new BitmapFactory.Options();
+            o.inJustDecodeBounds = true;
+            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
+
+
+            //Find the correct scale value. It should be the power of 2.
+            int scale = 1;
+            while (o.outWidth / scale / 2 > WIDTH && o.outHeight / scale / 2 > HEIGHT)
+                scale *= 2;
+
+            //Decode with inSampleSize
+            BitmapFactory.Options o2 = new BitmapFactory.Options();
+            o2.inSampleSize = scale;
+            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     //Preview preview;
     @Override
@@ -168,30 +191,8 @@ public class FaceActivity extends AppCompatActivity {
                 }
                 finish();
             }
-        }
-    }
 
-    public static Bitmap decodeFile(File f, int WIDTH, int HEIGHT) {
-        try {
-            //Decode image size
-            BitmapFactory.Options o = new BitmapFactory.Options();
-            o.inJustDecodeBounds = true;
-            BitmapFactory.decodeStream(new FileInputStream(f), null, o);
-
-
-
-            //Find the correct scale value. It should be the power of 2.
-            int scale = 1;
-            while (o.outWidth / scale / 2 > WIDTH && o.outHeight / scale / 2 > HEIGHT)
-                scale *= 2;
-
-            //Decode with inSampleSize
-            BitmapFactory.Options o2 = new BitmapFactory.Options();
-            o2.inSampleSize = scale;
-            return BitmapFactory.decodeStream(new FileInputStream(f), null, o2);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return null;
+            //no check for when #take_picture is clicked
         }
     }
 }
